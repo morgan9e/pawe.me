@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PAWE.ME</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class'
+    }
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  </script>
+  <style>
+    .url {
+      font-style: italic;
+      color: rgb(86, 105, 151);
+    }
+  </style>
+</head>
+
+<body class="font-sans text-gray-900 bg-gray-100 py-12 px-6 mx-auto max-w-5xl dark:bg-gray-900">
+  <header class="mb-10">
+    <h1 class="text-4xl font-bold mb-2"><a href="http://PAWE.ME"
+        class="text-blue-500 hover:text-blue-700">PAWE.ME</a></h1>
+    <h2 class="text-lg text-gray-600 dark:text-gray-300">Simple mirroring &amp; archiving server.</h2>
+    <h2 class="text-lg text-blue-400 dark:text-blue-200 italic"><a href="#">Hide my Email</a>, <a href="#">Invidious</a>, <a href="#">Proxy</a>.</h2>
+  </header>
+
+  <main>
+    <section class="mb-12">
+      <h2 class="dark:text-gray-200 text-2xl font-semibold mb-5">Mirroring List</h2>
+      <div id="mirrorList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+
+        <div class="bg-white dark:bg-gray-800 col-span-1 md:col-span-2 shadow-lg rounded-lg p-5">
+          <h3 class="dark:text-white text-lg font-semibold mb-1"><a href="/archlinux"
+              class="text-blue-500 hover:text-blue-700">ArchLinux (x86_64)</a></h3>
+          <p class="text-gray-600 dark:text-gray-300">Last Updated: 2023-10-05 08:00</p>
+          <p class="text-gray-600 dark:text-gray-300">Source: <span
+              class="url">rsync://mirror.rackspace.com/archlinux/</span></p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 col-span-1 shadow-lg rounded-lg p-5">
+          <h3 class="dark:text-white text-lg font-semibold mb-1"><a href="/ubuntu"
+              class="text-blue-500 hover:text-blue-700">Ubuntu</a></h3>
+          <p class="text-gray-600 dark:text-gray-300">Last Updated: 2023-10-05 06:00</p>
+          <p class="text-gray-600 dark:text-gray-300">Source: <span
+              class="url">rsync://rsync.archive.ubuntu.com/ubuntu/</span></p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 col-span-1 shadow-lg rounded-lg p-5">
+          <h3 class="dark:text-white text-lg font-semibold mb-1"><a href="/ubuntu_cd"
+              class="text-blue-500 hover:text-blue-700">Ubuntu Releases</a></h3>
+          <p class="text-gray-600 dark:text-gray-300">Last Updated: 2023-10-05 00:00</p>
+          <p class="text-gray-600 dark:text-gray-300">Source: <span
+              class="url">rsync://releases.ubuntu.com/releases/</span></p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 col-span-1 shadow-lg rounded-lg p-5">
+          <h3 class="dark:text-white text-lg font-semibold mb-1"><a href="/debian"
+              class="text-blue-500 hover:text-blue-700">Debian</a></h3>
+          <p class="text-gray-600 dark:text-gray-300">Last Updated: 2023-10-05 06:00</p>
+          <p class="text-gray-600 dark:text-gray-300">Source: <span class="url">rsync://ftp.halifax.rwth-aachen.de/debian/</span></p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 col-span-1 shadow-lg rounded-lg p-5">
+          <h3 class="dark:text-white text-lg font-semibold mb-1"><a href="/debian_cd"
+              class="text-blue-500 hover:text-blue-700">Debian Releases</a></h3>
+          <p class="text-gray-600 dark:text-gray-300">Last Updated: 2023-10-05 00:00</p>
+          <p class="text-gray-600 dark:text-gray-300">Source: <span class="url">rsync://ftp.lanet.kr/debian-cd/</span>
+          </p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 col-span-1 md:col-span-2 shadow-lg rounded-lg p-5">
+          <h3 class="dark:text-white text-lg font-semibold mb-1"><a href="/manjaro"
+              class="text-blue-500 hover:text-blue-700">Manjaro</a></h3>
+          <p class="text-gray-600 dark:text-gray-300">Last Updated: 2023-10-05 08:00</p>
+          <p class="text-gray-600 dark:text-gray-300">Source: <span
+              class="url">rsync://ftp.riken.jp/manjaro/</span></p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 col-span-1 md:col-span-2 shadow-lg rounded-lg p-5">
+          <h3 class="dark:text-white text-lg font-semibold mb-1"><a href="/raspbian"
+              class="text-blue-500 hover:text-blue-700">Raspbian</a></h3>
+          <p class="text-gray-600 dark:text-gray-300">Last Updated: 2023-10-05 08:00</p>
+          <p class="text-gray-600 dark:text-gray-300">Source: <span
+              class="url">rsync://archive.raspbian.org/archive/</span></p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 col-span-1 md:col-span-2 shadow-lg rounded-lg p-5">
+          <h3 class="dark:text-white text-lg font-semibold mb-1"><a href="/fedora"
+              class="text-blue-500 hover:text-blue-700">Fedora</a></h3>
+          <p class="text-gray-600 dark:text-gray-300">Last Updated: Not Synced</p>
+          <p class="text-gray-600 dark:text-gray-300">Source: <span
+              class="url">rsync://dl.fedoraproject.org/fedora-enchilada/linux/</span></p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 col-span-1 md:col-span-2 shadow-lg rounded-lg p-5">
+          <h3 class="dark:text-white text-lg font-semibold mb-1"><a href="/epel"
+              class="text-blue-500 hover:text-blue-700">Epel</a></h3>
+          <p class="text-gray-600 dark:text-gray-300">Last Updated: Not Synced</p>
+          <p class="text-gray-600 dark:text-gray-300">Source: <span
+              class="url">rsync://dl.fedoraproject.org/fedora-epel/</span></p>
+        </div>
+
+      </div>
+
+
+    </section>
+    <section class="mb-12">
+      <h2 class="dark:text-gray-200 text-2xl font-semibold mb-5">Additional Mirror</h2>
+      <!-- <button onclick="toggleView('httpView')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">View More</button> -->
+      <div id="httpView" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+        <div class="bg-white dark:bg-gray-800 col-span-1 md:col-span-2 shadow-lg rounded-lg p-5">
+          <h3 class="dark:text-white text-lg font-semibold mb-1"><a href="/archlinuxarm"
+              class="text-blue-500 hover:text-blue-700">ArchLinux (ARM)</a></h3>
+          <p class="text-gray-600 dark:text-gray-300">Last Updated: 2023-07-07 00:50</p>
+          <p class="text-gray-600 dark:text-gray-300">Source: <span
+              class="url">http://jp.mirror.archlinuxarm.org/</span></p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 col-span-1 md:col-span-2 shadow-lg rounded-lg p-5">
+          <h3 class="dark:text-white text-lg font-semibold mb-1"><a href="/asahilinux"
+              class="text-blue-500 hover:text-blue-700">AsahiLinux</a></h3>
+          <p class="text-gray-600 dark:text-gray-300">Last Updated: 2023-10-05 00:00</p>
+          <p class="text-gray-600 dark:text-gray-300">Source: <span class="url">https://cdn.asahilinux.org/</span></p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 col-span-1 md:col-span-2 shadow-lg rounded-lg p-5">
+          <h3 class="dark:text-white text-lg font-semibold mb-1"><a href="/ubuntu_cd_old"
+              class="text-blue-500 hover:text-blue-700">Ubuntu Releases (Old)</a></h3>
+          <p class="text-gray-600 dark:text-gray-300">Last Updated: 2023-03-06 14:39</p>
+          <p class="text-gray-600 dark:text-gray-300">Source: <span
+              class="url">rsync://old-releases.ubuntu.com/releases/</span></p>
+        </div>
+	<div class="bg-white dark:bg-gray-800 col-span-1 md:col-span-2 shadow-lg rounded-lg p-5">
+          <h3 class="dark:text-white text-lg font-semibold mb-1"><a href="/cd-image"
+              class="text-blue-500 hover:text-blue-700">Image Files</a></h3>
+        </div>
+      </div>
+    </section>
+    <section>
+      <h2 class="dark:text-gray-200 text-2xl font-semibold mb-5">Server Info</h2>
+      <ul class="space-y-2 mb-5">
+        <li class="text-gray-600 dark:text-gray-500">Xeon E5 CPU</li>
+        <li class="text-gray-600 dark:text-gray-500">12GiB Memory</li>
+        <li class="text-gray-600 dark:text-gray-500">750Mbps Network, Seoul, Korea</li>
+        <li class="text-gray-600 dark:text-gray-500">18TB Storage</li>
+      </ul>
+      <p class="text-gray-500 dark:text-gray-600 url">Fill out <a href="/form.html" class="text-blue-500 dark:text-blue-800">this</a> form to request additional mirroring.</p>
+
+    </section>
+    <button
+      class="fixed bottom-6 right-6 bg-blue-200 hover:bg-blue-300 text-blue-700 dark:bg-blue-800 dark:hover:bg-blue-600 dark:text-white w-10 h-10 rounded-full flex items-center justify-center"
+      onclick="toggleDarkMode()">
+      +
+    </button>
+  </main>
+
+  <footer class="mt-10 text-center text-gray-600">
+    <a href="mailto:mirror@devpg.net">&copy; PAWE.ME</a>
+  </footer>
+
+  <script>
+    function toggleView(elementId) {
+      const element = document.getElementById(elementId);
+      element.style.display = element.style.display === "none" ? "block" : "none";
+    }
+    function toggleDarkMode() {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.theme = 'light';
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.theme = 'dark';
+      }
+    }
+  </script>
+</body>
+
+</html>

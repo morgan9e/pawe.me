@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Viewer</title>
+</head>
+
+<body>
+
+<input type="text" id="logPath" placeholder="Enter log file path or URL">
+<select id="intervalSelector">
+    <option value="1000">1 sec</option>
+    <option value="2000">2 sec</option>
+    <option value="3000">3 sec</option>
+</select>
+<button onclick="startFetchingLog()">Start Fetching</button>
+<button onclick="toggleFetching()">Toggle Fetching</button>
+
+<div id="logContent" style="white-space: pre-wrap;"></div>
+
+<script>
+    let interval;
+    let isFetching = false;
+
+    function fetchLog(path) {
+        fetch(path)
+            .then(response => response.text())
+            .then(data => {
+                const reversedData = data.split("\n").reverse().join("\n");
+                document.getElementById('logContent').textContent = reversedData;
+            })
+            .catch(error => {
+                console.error('There was an error fetching the log:', error);
+            });
+    }
+
+    function startFetchingLog() {
+        stopFetching(); // Stop any existing fetching
+        
+        const path = document.getElementById('logPath').value;
+        const fetchInterval = parseInt(document.getElementById('intervalSelector').value);
+        if (path) {
+            fetchLog(path); // Initial fetch
+            interval = setInterval(() => fetchLog(path), fetchInterval); // Fetch the log file at the selected interval
+            isFetching = true;
+        }
+    }
+
+    function stopFetching() {
+        if (interval) {
+            clearInterval(interval);
+            isFetching = false;
+        }
+    }
+
+    function toggleFetching() {
+        if (isFetching) {
+            stopFetching();
+        } else {
+            startFetchingLog();
+        }
+    }
+</script>
+
+</body>
+
+</html>
+
