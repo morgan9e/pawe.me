@@ -1,7 +1,7 @@
 ## PAWE.ME
 Simple mirroring &amp; archiving server.
 
-- This script is used to serve ![pawe.me](https://pawe.me) mirroring server.
+- This script is used to serve [pawe.me](https://pawe.me) mirroring server.
 
 - config.yaml contains various config options, can add more repo/upstream with just adding to config. supports http, rsync, ftpsync(debian).
 
