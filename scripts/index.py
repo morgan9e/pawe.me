@@ -1,48 +1,80 @@
-import os, sys, re
+#!/usr/bin/python3
+
+import os, sys
+import yaml
+import jinja2
 import datetime
-from pprint import pprint
 
-base_path = sys.argv[1]
-assert os.path.exists(base_path)
+BASE_DIR = "."
 
-log_path = os.path.join(base_path, "logs/all.log")
-assert os.path.exists(log_path)
+CONFIG_PATH = os.path.join(BASE_DIR, "scripts/config.yml")
+TEMPLATES_DIR = os.path.join(BASE_DIR, "scripts/templates")
+LOG_DIR = os.path.join(BASE_DIR, "logs")
+OUTPUT_PATH = os.path.join(BASE_DIR, "index.html")
 
-html_path = os.path.join(base_path, "scripts/base.html")
-index = os.path.join(base_path, "index.html")
-assert os.path.exists(html_path)
+# def get_last_sync(repo_name):
+#     log_path = os.path.join(LOG_DIR, f"all.log")
+#     if os.path.exists(log_path):
+#         with open(log_path, 'r') as log_file:
+#             log_all = reversed(log_file.readlines())
+#             for logline in log_all:
+#                 time, stat, dist = logline.split()
+#                 if repo_name == dist and stat =="DONE":
+#                     return datetime.datetime.strptime(time, '%Y%m%d_%H%M').strftime("%Y-%m-%d %H:%M")
+#     return "Not Synced"
 
-with open(log_path, 'r') as f:
-    log_file = f.read().splitlines()
-log_file.reverse()
+# main()
 
-with open(html_path, 'r') as f:
-    html_file = f.read()
-dists = re.findall("@@([^@@]+)@@", html_file)
-pprint(dists)
+if __name__=="__main__":
+    with open(CONFIG_PATH, 'r') as f:
+        config = yaml.safe_load(f)
 
-logs = {}
-for dist in dists:
-    logs[dist] = []
+    env = jinja2.Environment(loader=jinja2.FileSystemLoader(TEMPLATES_DIR))
+    base_template = env.get_template('base.html')
+    full_template = env.get_template('full.html')
+    half_template = env.get_template('half.html')
 
-for logline in log_file:
-    print(logline)
-    time, stat, dist = logline.split(" ")
-    if stat == "DONE":
-    	time = datetime.datetime.strptime(time, '%Y%m%d_%H%M')
-    	if dist in logs.keys():
-    		logs[dist].append(time)
+    main_repos = []
+    additional_repos = []
 
-last = {}
-for dist in logs:
-    if logs[dist]:
-    	last[dist] = sorted(logs[dist])[-1].strftime("%Y-%m-%d %H:%M") 
-    else:
-    	last[dist] = "Not Synced"
-pprint(last)
+    DIV = 0
+    for line in config['index']:
+        if line == "DIVIDER":
+            DIV = 1
+            continue
+        repos_line = line.split()
+        for repo_name in repos_line:
+            repo_data = config['repos'].get(repo_name)
+            if not repo_data:
+                continue
 
-for dist in last:
-    html_file = html_file.replace(f"@@{dist}@@", last[dist])
+            context = {
+                'path': repo_data['path'],
+                'name': repo_data['name'],
+                'lastsync': repo_data.get('lastsync', "Not Synced"),
+                'upstream': repo_data['url']
+            }
+            print(context)
+            if len(repos_line) > 1:
+                (main_repos if not DIV else additional_repos).append(half_template.render(**context))
+            else:
+                (main_repos if not DIV else additional_repos).append(full_template.render(**context))
 
-with open(index, 'w') as f:
-    f.write(html_file)
+    html_output = base_template.render(
+        repos="\n".join(main_repos),
+        repos_more="\n".join(additional_repos)
+    )
+
+    try:
+        with open(OUTPUT_PATH, 'w') as f:
+            f.write(html_output)
+
+    except:
+        if len(sys.argv) == 2:
+            if os.path.exists(sys.argv[1]):
+                if not os.path.isdir(sys.argv[1]):
+                    print(f"Writing to {sys.argv[1]}")
+                    with open(sys.argv[1], 'w') as f:
+                        f.write(html_output)
+        else:
+            print(html_output)

@@ -1,79 +1,141 @@
 #!/bin/bash
-TIMENOW=$(date '+%Y%m%d_%H%M')
-BASE_DIR="/srv/mirror"
-ALERT=""
 
-option="-rtlHpv --chmod=D0755,F0644 --partial --hard-links --safe-links --stats --delete --delete-after --delay-updates --max-delete=70000"
+CONFIG_PATH="./scripts/config.yml"
+YAML="./scripts/yq"
 
-exclude="--exclude=.*.?????? --exclude='.~tmp~/' --exclude='Packages*' --exclude='Sources*' --exclude='Release*' --exclude='*.links.tar.gz*' --exclude='/other' --exclude='/sources'"
+BASE_DIR=$($YAML eval ".BASE_DIR" "${CONFIG_PATH}")
+TIMESTAMP=$(date '+%Y-%m-%dT%H:%MZ')
 
-ubuntu="rsync://rsync.archive.ubuntu.com/ubuntu/"
-ubuntu_cd="rsync://releases.ubuntu.com/releases/"
-ubuntu_cd_old="rsync://old-releases.ubuntu.com/releases/"
-debian="rsync://mirrors.xtom.jp/debian/"
-debian_cd="rsync://ftp.lanet.kr/debian-cd/"
-fedora="rsync://dl.fedoraproject.org/fedora-enchilada/linux/"
-epel="rsync://dl.fedoraproject.org/fedora-epel/"
-fedora_cd=""
-archlinux="rsync://mirror.rackspace.com/archlinux/"
-raspbian="rsync://archive.raspbian.org/archive/"
-manjaro="rsync://ftp.riken.jp/manjaro/"
+parse_yaml() {
+    echo $($YAML eval ".$1" "${CONFIG_PATH}")
+}
 
-DIST_ARR=('archlinux' 'debian' 'debian_cd' 'ubuntu' 'ubuntu_cd' 'ubuntu_cd_old' 'raspbian' 'epel' 'fedora' 'fedora_cd' 'manjaro')
+sync_repo() {
 
-in=0
-for di in "${DIST_ARR[@]}"
-do 
-	if [ "$di" == "$1" ]; then in=1; fi 
+    local repo=$1
+    local type=$(parse_yaml "repos.${repo}.type")
+    local url=$(parse_yaml "repos.${repo}.url")
+    local path=$(parse_yaml "repos.${repo}.path")
+    local log=$(parse_yaml "repos.${repo}.log")
+
+    if [[ "$type" == "null" ]]; then
+        type=$(parse_yaml "global.type")
+    fi
+
+    if [[ "$log" == "null" ]]; then
+        log="$(parse_yaml "global.log_dir")$path"
+    fi
+
+    log=$(realpath $log)
+    path="${BASE_DIR}/$path/"
+    echo -e "----\n|  Repo: $repo\n|  Type: $type\n|  Upstream: $url\n|  Path: $path\n|  Log: $log\n----"
+    
+    rotate_log $log
+
+    case $type in
+        "rsync")
+            local rsync_options=$(parse_yaml 'global.rsync.options')
+            local exclude_list=($(parse_yaml 'global.rsync.exclude[]'))
+            local exclude=""
+            for ex in "${exclude_list[@]}"; do
+                exclude="${exclude} --exclude='${ex}'"
+            done
+            echo rsync ${rsync_options} ${exclude} $url $path >> $log
+            rsync ${rsync_options} ${exclude} $url $path >> $log 2>> ${log}-error
+            ;;
+        "ftpsync")
+            cd ${BASE_DIR}/scripts
+            export BASE_DIR=${BASE_DIR}
+            ./ftpsync >> $log 2>> ${log}-error
+            cd ${BASE_DIR}
+            ;;
+        "http")
+            echo ${repo} Fetch >> $log 2>> ${log}-error
+            python3 -u $BASE_DIR/scripts/getFetch.py "${url}" $path $BASE_DIR/scripts/${path}.fetch >> $log 2>> ${log}-error
+            echo ${repo} Download >> $log 2>> ${log}-error
+            python3 -u $BASE_DIR/scripts/getFile.py $BASE_DIR/scripts/${path}.fetch >> $log 2>> ${log}-error
+            ;;
+        *)
+            echo "Unknown type $type for $repo." | tee ${log}-error
+            ;;
+    esac
+
+    clean_log $log
+}
+
+rotate_log() {
+    local log_file=$1
+    if [[ -f $log_file ]]; then
+        PREV_LOG=$(cat "$log_file" | head -n 1)    
+        old_log_file="$(dirname $log_file)/old/$(basename $log_file)-$PREV_LOG"
+        mkdir -p "$(dirname $old_log_file)"
+        mv "$log_file" "$old_log_file"
+    fi
+
+    local error_file=$1-error
+    if [[ -f $error_file ]]; then
+        PREV_LOG=$(cat "$error_file" | head -n 1)    
+        old_error_file="$(dirname $error_file)/old/$(basename $error_file)-$PREV_LOG"
+        mkdir -p "$(dirname $old_error_file)"
+        mv "$error_file" "$old_error_file"
+    fi
+
+    echo $TIMESTAMP >> $log_file
+    echo $TIMESTAMP >> $error_file
+}
+
+clean_log() {
+    local error_file=$1-error
+    nl=$(cat "$error_file" | wc -l)
+    if [ $nl -eq 1 ]; then
+        rm "$error_file"
+    fi
+}
+
+##########
+#  Main  # 
+##########
+
+echo Started job $TIMESTAMP..
+
+global_pre_scripts=($(parse_yaml 'global.scripts.pre[]'))
+for script in "${global_pre_scripts[@]}"; do
+    $script
 done
 
-if [ "$in" -ne 1 ]; then
-	echo Not declared;exit;
+repos=($(parse_yaml 'global.sync[]'))
+
+if [[ "${repos[0]}" == "ALL" ]]; then
+    repos=($($YAML eval '.repos | keys| .[]' "${CONFIG_PATH}"))
 fi
+for repo in "${repos[@]}"; do
+    echo Checking $repo...
+    duration=$(parse_yaml "repos.${repo}.duration")
+    last_sync_timestamp=$(date -d "$(parse_yaml "repos.${repo}.last_sync")" +%s)
+    next_sync_timestamp=$(( last_sync_timestamp + duration * 3600 ))
+    next_sync_timestamp=1
+    if [ $next_sync_timestamp -le $(date +%s) ]; then
+        echo "Lastsync $last_sync_timestamp"
+        echo "Syncing $repo..."
 
-dist=$1
-echo Syncing $1...
+        sync_repo $repo
 
-LASTLOG=`head -1 ${BASE_DIR}/logs/${dist}.log`
+        if [ $? -ne 0 ]; then
+            global_fail_scripts=($(parse_yaml 'global.scripts.fail[]'))
+            for script in "${global_fail_scripts[@]}"; do
+                $script
+            done
+            echo "Error syncing $repo"
+        else
+            $YAML eval ".repos.${repo}.last_sync = \"$TIMESTAMP\"" -i "${CONFIG_PATH}"
+            echo "Successfully synced $repo."
+        fi
+    fi
+done
 
-mv ${BASE_DIR}/logs/${dist}.log ${BASE_DIR}/logs/previous/${dist}-${LASTLOG}.log
-mv ${BASE_DIR}/logs/${dist}-error.log ${BASE_DIR}/logs/previous/${dist}-error-${LASTLOG}.log
+global_post_scripts=($(parse_yaml 'global.scripts.post[]'))
+for script in "${global_post_scripts[@]}"; do
+    $script
+done
 
-echo ${TIMENOW} >> ${BASE_DIR}/logs/${dist}.log
-echo ${TIMENOW} >> ${BASE_DIR}/logs/${dist}-error.log
-echo "${TIMENOW}: Mirroring ${dist} from ${!dist} to ${BASE_DIR}/${dist}"
-echo "${TIMENOW} STARTED ${dist}" >> ${BASE_DIR}/logs/all.log
-
-if [ "$dist" == "debian" ];
-then
-	cd ${BASE_DIR}/scripts
-	export BASE_DIR=${BASE_DIR}
-	./ftpsync
-else
-	echo "rsync ${option} ${exclude} ${!dist} ${BASE_DIR}/${dist}" >> ${BASE_DIR}/logs/${dist}.log 
-	rsync ${option} ${exclude} ${!dist} ${BASE_DIR}/${dist} >> ${BASE_DIR}/logs/${dist}.log 2>> ${BASE_DIR}/logs/${dist}-error.log
-fi
-
-if [ $? -ne 0 ];
-then
-	cd ${ALERT}
-	MSG="${dist} failed at ${TIMENOW}"
-	if [ -n "$ALERT" ];
-	then
-		${ALERT}/alert alert "${MSG}"
-	fi
-	
-	echo Sync ${dist} Error
-	echo "${TIMENOW} ERROR ${dist}" >> ${BASE_DIR}/logs/all.log
-	echo curl -X POST -d 'email=DEVPG.NET' -d "title=${dist}" -d "content=${MSG}" https://one.devpg.net/send
-else
-	echo Sync ${dist} Success
-	if [ `echo ${BASE_DIR}/logs/${dist}-error.log | wc -l` -eq 1 ]; 
-	then
-		rm ${BASE_DIR}/logs/${dist}-error.log
-	fi
-	echo "${TIMENOW} DONE ${dist}" >> ${BASE_DIR}/logs/all.log
-	cd $BASE_DIR
-	echo "Updating Index"
-	python3 -u ./scripts/index.py ${BASE_DIR}
-fi
+echo Ended job $TIMESTAMP..
