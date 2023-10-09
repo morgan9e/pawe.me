@@ -28,28 +28,28 @@ global:
 repos:
   ARCHLINUX:
     url: rsync://mirrors.xtom.de/archlinux/
-    duration: 4
+    delay: 4
     name: "ArchLinux (x86_64)"
     path: archlinux
     log: ./logs/archlinux
     last_sync: "2023-10-09T23:48Z"
   UBUNTU:
     url: rsync://rsync.archive.ubuntu.com/ubuntu/
-    duration: 4
+    delay: 4
     name: "Ubuntu"
     path: ubuntu
     log: ./logs/ubuntu
     last_sync: "2023-10-09T23:48Z"
   UBUNTU_CD:
     url: rsync://releases.ubuntu.com/releases/
-    duration: 24
+    delay: 24
     name: "Ubuntu Releases"
     path: ubuntu_cd
     log: ./logs/ubuntu_cd
     last_sync: "2023-10-09T23:48Z"
   UBUNTU_CD_OLD:
     url: rsync://old-releases.ubuntu.com/releases/
-    duration: 24
+    delay: 24
     name: "Ubuntu Releases (Old)"
     path: ubuntu_cd_old
     log: ./logs/ubuntu_cd_old
@@ -57,7 +57,7 @@ repos:
   DEBIAN:
     url: rsync://mirrors.xtom.jp/debian/
     type: ftpsync
-    duration: 4
+    delay: 4
     name: Debian
     path: debian
     scripts:
@@ -65,28 +65,28 @@ repos:
     last_sync: "2023-10-09T23:48Z"
   DEBIAN_CD:
     url: rsync://ftp.lanet.kr/debian-cd/
-    duration: 24
+    delay: 24
     name: "Debian CD"
     path: debian_cd
     log: ./logs/debian_cd
     last_sync: "2023-10-09T23:48Z"
   FEDORA:
     url: rsync://dl.fedoraproject.org/fedora-enchilada/linux/
-    duration: 4
+    delay: 4
     name: "Fedora"
     path: fedora
     log: ./logs/fedora
     last_sync: "2023-10-09T23:30Z"
   RASPBIAN:
     url: rsync://archive.raspbian.org/archive/
-    duration: 6
+    delay: 6
     name: "Raspbian"
     path: raspbian
     log: ./logs/raspbian
     last_sync: "2023-10-09T23:30Z"
   MANJARO:
     url: rsync://ftp.riken.jp/manjaro/
-    duration: 4
+    delay: 4
     name: Manjaro
     path: manjaro
     log: ./logs/manjaro
@@ -96,14 +96,14 @@ repos:
     path: archlinuxarm
     url: http://jp.mirror.archlinuxarm.org/
     type: http
-    duration: 12
+    delay: 12
     last_sync: "2023-10-09T23:30Z"
   ASAHILINUX:
     name: "AsahiLinux"
     path: asahilinux
     url: https://cdn.asahilinux.org/
     type: http
-    duration: 12
+    delay: 12
     last_sync: "2023-10-09T23:30Z"
 index:
   - ARCHLINUX

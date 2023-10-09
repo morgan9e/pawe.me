@@ -110,10 +110,10 @@ if [[ "${repos[0]}" == "ALL" ]]; then
 fi
 for repo in "${repos[@]}"; do
     echo Checking $repo...
-    duration=$(parse_yaml "repos.${repo}.duration")
+    delay=$(parse_yaml "repos.${repo}.delay")
     last_sync_timestamp=$(date -d "$(parse_yaml "repos.${repo}.last_sync")" +%s)
-    next_sync_timestamp=$(( last_sync_timestamp + duration * 3600 ))
-    next_sync_timestamp=1
+    next_sync_timestamp=$(( last_sync_timestamp + delay * 3600 ))
+    
     if [ $next_sync_timestamp -le $(date +%s) ]; then
         echo "Lastsync $last_sync_timestamp"
         echo "Syncing $repo..."
