@@ -236,9 +236,9 @@ for repo in "${repos[@]}"; do
     cd $BASE_DIR
     debug "Checking $repo..."
     
-    duration=$(get_repo_config ${repo} "duration")
+    delay=$(get_repo_config ${repo} "delay")
     last_sync_timestamp=$(date -d "$(get_repo_config ${repo} "last_sync")" +%s)
-    next_sync_timestamp=$(( last_sync_timestamp + duration * 3600 ))
+    next_sync_timestamp=$(( last_sync_timestamp + delay * 3600 ))
     
     if [[ -v DEBUG ]]; then
         next_sync_timestamp=1

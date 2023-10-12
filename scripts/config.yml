@@ -47,21 +47,13 @@ repos:
 
   UBUNTU_CD:
     url: rsync://releases.ubuntu.com/releases/
-<<<<<<< HEAD
-    duration: 12
-=======
-    delay: 24
->>>>>>> refs/remotes/origin/main
+    delay: 12
     name: "Ubuntu Releases"
     path: ubuntu_cd
 
   UBUNTU_CD_OLD:
     url: rsync://old-releases.ubuntu.com/releases/
-<<<<<<< HEAD
-    duration: 12
-=======
-    delay: 24
->>>>>>> refs/remotes/origin/main
+    delay: 12
     name: "Ubuntu Releases (Old)"
     path: ubuntu_cd_old
 
@@ -77,11 +69,7 @@ repos:
   
   DEBIAN_CD:
     url: rsync://ftp.lanet.kr/debian-cd/
-<<<<<<< HEAD
-    duration: 12
-=======
-    delay: 24
->>>>>>> refs/remotes/origin/main
+    delay: 12
     name: "Debian CD"
     path: debian_cd
   
@@ -108,25 +96,15 @@ repos:
     path: archlinuxarm
     url: http://jp.mirror.archlinuxarm.org/
     type: http
-<<<<<<< HEAD
-    duration: 12
-  
-=======
     delay: 12
-    last_sync: "2023-10-09T23:30Z"
->>>>>>> refs/remotes/origin/main
+  
   ASAHILINUX:
     name: "AsahiLinux"
     path: asahilinux
     url: https://cdn.asahilinux.org/
     type: http
-<<<<<<< HEAD
-    duration: 12
-
-=======
     delay: 12
-    last_sync: "2023-10-09T23:30Z"
->>>>>>> refs/remotes/origin/main
+
 index:
   - ARCHLINUX
   - UBUNTU UBUNTU_CD
