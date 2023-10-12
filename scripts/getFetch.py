@@ -53,8 +53,6 @@ if __name__ == "__main__":
 	    print("Usage: createFetch.py [URL] [Path] (fetch)")
 	    sys.exit()
 
-	# urls = {"archlinuxarm": "http://jp.mirror.archlinuxarm.org/", "asahilinux": "https://cdn.asahilinux.org/", "linux-surface": "https://pkg.surfacelinux.com/arch/"}
-
 	if "http" in sys.argv[1]:
 	    if input(f"[*] Download from {sys.argv[1]}? ") in "Yy":
 	        url = sys.argv[1]

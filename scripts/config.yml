@@ -35,32 +35,40 @@ defaults:
 repos:
   ARCHLINUX:
     url: rsync://mirrors.xtom.de/archlinux/
-    duration: 4
+    delay: 4
     name: "ArchLinux (x86_64)"
     path: archlinux
 
   UBUNTU:
     url: rsync://rsync.archive.ubuntu.com/ubuntu/
-    duration: 4
+    delay: 4
     name: "Ubuntu"
     path: ubuntu
 
   UBUNTU_CD:
     url: rsync://releases.ubuntu.com/releases/
+<<<<<<< HEAD
     duration: 12
+=======
+    delay: 24
+>>>>>>> refs/remotes/origin/main
     name: "Ubuntu Releases"
     path: ubuntu_cd
 
   UBUNTU_CD_OLD:
     url: rsync://old-releases.ubuntu.com/releases/
+<<<<<<< HEAD
     duration: 12
+=======
+    delay: 24
+>>>>>>> refs/remotes/origin/main
     name: "Ubuntu Releases (Old)"
     path: ubuntu_cd_old
 
   DEBIAN:
     url: rsync://mirrors.xtom.jp/debian/
     type: ftpsync
-    duration: 4
+    delay: 4
     name: Debian
     path: debian
     scripts:
@@ -69,25 +77,29 @@ repos:
   
   DEBIAN_CD:
     url: rsync://ftp.lanet.kr/debian-cd/
+<<<<<<< HEAD
     duration: 12
+=======
+    delay: 24
+>>>>>>> refs/remotes/origin/main
     name: "Debian CD"
     path: debian_cd
   
   FEDORA:
     url: rsync://dl.fedoraproject.org/fedora-enchilada/linux/
-    duration: 4
+    delay: 4
     name: "Fedora"
     path: fedora
   
   RASPBIAN:
     url: rsync://archive.raspbian.org/archive/
-    duration: 6
+    delay: 6
     name: "Raspbian"
     path: raspbian
   
   MANJARO:
     url: rsync://ftp.riken.jp/manjaro/
-    duration: 4
+    delay: 4
     name: Manjaro
     path: manjaro
   
@@ -96,15 +108,25 @@ repos:
     path: archlinuxarm
     url: http://jp.mirror.archlinuxarm.org/
     type: http
+<<<<<<< HEAD
     duration: 12
   
+=======
+    delay: 12
+    last_sync: "2023-10-09T23:30Z"
+>>>>>>> refs/remotes/origin/main
   ASAHILINUX:
     name: "AsahiLinux"
     path: asahilinux
     url: https://cdn.asahilinux.org/
     type: http
+<<<<<<< HEAD
     duration: 12
 
+=======
+    delay: 12
+    last_sync: "2023-10-09T23:30Z"
+>>>>>>> refs/remotes/origin/main
 index:
   - ARCHLINUX
   - UBUNTU UBUNTU_CD
