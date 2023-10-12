@@ -6,22 +6,21 @@ import jinja2
 import datetime
 
 BASE_DIR = "."
-
 CONFIG_PATH = os.path.join(BASE_DIR, "scripts/config.yml")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "scripts/templates")
 LOG_DIR = os.path.join(BASE_DIR, "logs")
+SYNC_LOG = os.path.join(LOG_DIR, "sync.log")
 OUTPUT_PATH = os.path.join(BASE_DIR, "index.html")
 
-# def get_last_sync(repo_name):
-#     log_path = os.path.join(LOG_DIR, f"all.log")
-#     if os.path.exists(log_path):
-#         with open(log_path, 'r') as log_file:
-#             log_all = reversed(log_file.readlines())
-#             for logline in log_all:
-#                 time, stat, dist = logline.split()
-#                 if repo_name == dist and stat =="DONE":
-#                     return datetime.datetime.strptime(time, '%Y%m%d_%H%M').strftime("%Y-%m-%d %H:%M")
-#     return "Not Synced"
+def get_last_sync(repo_name):
+    if os.path.exists(SYNC_LOG):
+        with open(SYNC_LOG, 'r') as log_file:
+            log_all = reversed(log_file.readlines())
+            for logline in log_all:
+                dist, time, stat = logline.split()
+                if repo_name == dist and stat =="SUCCESS":
+                    return datetime.datetime.strptime(time, '%Y-%m-%dT%H:%MZ').strftime("%Y-%m-%d %H:%M")
+    return "Not Synced"
 
 # main()
 
@@ -51,7 +50,8 @@ if __name__=="__main__":
             context = {
                 'path': repo_data['path'],
                 'name': repo_data['name'],
-                'lastsync': repo_data.get('lastsync', "Not Synced"),
+                'lastsync': get_last_sync(repo_name),
+                # 'lastsync': repo_data.get('lastsync', "Not Synced"),
                 'upstream': repo_data['url']
             }
             print(context)

@@ -1,19 +1,25 @@
 BASE_DIR: /srv/mirror
-ENV: ./scripts/.env
+
+# Any path under this must be in relative of BASE_DIR.
+# Script doesnt do any kind of outbound check, so make sure to check all paths.
+
 global:
+  scripts:
+    pre:
+    post:
+  log: logs/sync.log
+  sync:
+    - ALL
+
+defaults:
   type: rsync
   scripts:
     pre:
-    # - ./scripts/cleanup.sh
     fail:
-      - ./scripts/alert.sh
+      - scripts/alert.sh
     post:
-      - ./script/index.py
-    # - ./script/rotate_log.py
-  log: ./logs/sync.log
-  log_dir: ./logs/
-  sync:
-    - ALL
+      - scripts/index.py
+  log: logs/${path}.log
   rsync:
     options: "-rtlHpv --chmod=D0755,F0644 --partial --hard-links --safe-links --stats --delete --delete-after --delay-updates --max-delete=70000"
     exclude:
@@ -25,35 +31,32 @@ global:
       - "*.links.tar.gz*"
       - "/other"
       - "/sources"
+
 repos:
   ARCHLINUX:
     url: rsync://mirrors.xtom.de/archlinux/
     duration: 4
     name: "ArchLinux (x86_64)"
     path: archlinux
-    log: ./logs/archlinux
-    last_sync: "2023-10-09T23:48Z"
+
   UBUNTU:
     url: rsync://rsync.archive.ubuntu.com/ubuntu/
     duration: 4
     name: "Ubuntu"
     path: ubuntu
-    log: ./logs/ubuntu
-    last_sync: "2023-10-09T23:48Z"
+
   UBUNTU_CD:
     url: rsync://releases.ubuntu.com/releases/
-    duration: 24
+    duration: 12
     name: "Ubuntu Releases"
     path: ubuntu_cd
-    log: ./logs/ubuntu_cd
-    last_sync: "2023-10-09T23:48Z"
+
   UBUNTU_CD_OLD:
     url: rsync://old-releases.ubuntu.com/releases/
-    duration: 24
+    duration: 12
     name: "Ubuntu Releases (Old)"
     path: ubuntu_cd_old
-    log: ./logs/ubuntu_cd_old
-    last_sync: "2023-10-09T23:48Z"
+
   DEBIAN:
     url: rsync://mirrors.xtom.jp/debian/
     type: ftpsync
@@ -61,50 +64,47 @@ repos:
     name: Debian
     path: debian
     scripts:
-    # pre: ./scripts/pre_debian.sh
-    last_sync: "2023-10-09T23:48Z"
+    # pre: scripts/pre_debian.sh
+    last_sync: "2023-10-12T10:58Z"
+  
   DEBIAN_CD:
     url: rsync://ftp.lanet.kr/debian-cd/
-    duration: 24
+    duration: 12
     name: "Debian CD"
     path: debian_cd
-    log: ./logs/debian_cd
-    last_sync: "2023-10-09T23:48Z"
+  
   FEDORA:
     url: rsync://dl.fedoraproject.org/fedora-enchilada/linux/
     duration: 4
     name: "Fedora"
     path: fedora
-    log: ./logs/fedora
-    last_sync: "2023-10-09T23:30Z"
+  
   RASPBIAN:
     url: rsync://archive.raspbian.org/archive/
     duration: 6
     name: "Raspbian"
     path: raspbian
-    log: ./logs/raspbian
-    last_sync: "2023-10-09T23:30Z"
+  
   MANJARO:
     url: rsync://ftp.riken.jp/manjaro/
     duration: 4
     name: Manjaro
     path: manjaro
-    log: ./logs/manjaro
-    last_sync: "2023-10-09T23:30Z"
+  
   ARCHLINUXARM:
     name: "ArchLinux (ARM)"
     path: archlinuxarm
     url: http://jp.mirror.archlinuxarm.org/
     type: http
     duration: 12
-    last_sync: "2023-10-09T23:30Z"
+  
   ASAHILINUX:
     name: "AsahiLinux"
     path: asahilinux
     url: https://cdn.asahilinux.org/
     type: http
     duration: 12
-    last_sync: "2023-10-09T23:30Z"
+
 index:
   - ARCHLINUX
   - UBUNTU UBUNTU_CD
