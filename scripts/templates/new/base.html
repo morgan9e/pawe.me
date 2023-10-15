@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>repo.city</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class'
+    }
+    // if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    //  document.documentElement.classList.add('dark')
+    if (localStorage.theme === 'dark') {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  </script>
+  <style>
+    .url {
+      font-style: italic;
+      color: rgb(86, 105, 151);
+    }
+  </style>
+</head>
+
+<body class="font-sans text-gray-900 bg-gray-100 py-12 px-6 mx-auto max-w-5xl dark:bg-gray-900">
+  <header class="mb-10 ml-2">
+    <h1 class="text-3xl font-bold mb-2 text-black dark:text-white">Welcome to <a href="https://repo.city"
+                     class="text-blue-900 dark:text-blue-300 font-bold">REPO.CITY</a>!</h1>
+    <h2 class="text-xl text-gray-600 dark:text-gray-300">Simple mirroring &amp; archiving server.</h2>
+  </header>
+  <main>
+    <section class="mb-12">
+      <h2 class="dark:text-gray-200 text-2xl font-semibold mb-5 ml-2">Mirroring List</h2>
+      <div id="mirrorList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+
+        {{ repos }}
+
+      </div>
+
+
+    </section>
+    <section class="mb-12">
+      <h2 class="dark:text-gray-200 text-2xl font-semibold mb-5 ml-2">Additional Mirror</h2>
+      <!-- <button onclick="toggleView('httpView')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">View More</button> -->
+      <div id="httpView" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+
+        {{ repos_more }}
+
+        <div class="bg-white dark:bg-gray-800 col-span-1 md:col-span-2 shadow-lg rounded-lg p-5">
+          <h3 class="dark:text-white text-lg font-semibold mb-1"><a href="/cd-image"
+              class="text-blue-900 hover:text-blue-600 dark:text-blue-600 dark:hover:text-blue-400">Image Files</a></h3>
+        </div>
+      </div>
+    </section>
+    <section class="ml-2">
+      <h2 class="dark:text-gray-200 text-2xl font-semibold mb-4">Server Details</h2>
+        <p class="mb-2 text-gray-800 dark:text-gray-500"><strong>Location:</strong> Seoul, Korea</p>
+  <p class="mb-2 text-gray-800 dark:text-gray-500"><strong>Bandwidth:</strong> ~1Gbps</p>
+  <p class="mb-2 text-gray-800 dark:text-gray-500"><strong>Storage size:</strong> 32TiB</p>
+  <p class="mb-2 text-gray-800 dark:text-gray-500"><strong>Sync delay:</strong> 4hrs</p>  
+  <p class="mb-2 text-gray-800 dark:text-gray-500"><strong>Contact:</strong> <a href="mailto:mirror@devpg.net">mirror@devpg.net</a></p>
+  <p class="mb-2 text-gray-800 dark:text-gray-500"><strong>Maintainer:</strong> <a href="https://github.com/morgan9e">@morgan9e</a></p>
+      <p class="text-gray-500 dark:text-gray-600 url">This mirror is based on <a href="https://github.com/morgan9e/reposync" class="text-blue-500 dark:text-blue-800">reposync</a>.</p>
+      <p class="text-gray-500 dark:text-gray-600 url">For additional mirroring requests, please contact me at email above.</p>
+    </section>
+    <button
+      class="fixed bottom-6 right-6 bg-blue-200 hover:bg-blue-300 text-blue-700 dark:bg-blue-800 dark:hover:bg-blue-600 dark:text-white w-10 h-10 rounded-full flex items-center justify-center"
+      onclick="toggleDarkMode()">
+      +
+    </button>
+  </main>
+
+  <footer class="mt-10 text-center text-gray-600">
+    <a href="mailto:mirror@devpg.net">&copy; REPO.CITY</a>
+  </footer>
+
+  <script>
+    function toggleView(elementId) {
+      const element = document.getElementById(elementId);
+      element.style.display = element.style.display === "none" ? "block" : "none";
+    }
+    function toggleDarkMode() {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.theme = 'light';
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.theme = 'dark';
+      }
+    }
+  </script>
+</body>
+</html>

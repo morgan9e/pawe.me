@@ -65,10 +65,10 @@ sync_repo() {
         return
     fi
 
-    path="${BASE_DIR}/$path/"
+    full_path="${BASE_DIR}/$(parse_yaml global.data_dir)/$path/"
     log="${BASE_DIR}/$log"
 
-    echo -e "--------\nRepo:      $name\nType:      $type\nUpstream:  $url\nPath:      $path\nLog:       $log\n--------"
+    echo -e "--------\nRepo:      $name\nType:      $type\nUpstream:  $url\nPath:      $full_path\nLog:       $log\n--------"
 
     if [[ ! -v DRY_RUN ]]; then
 
@@ -82,18 +82,26 @@ sync_repo() {
                 for ex in "${exclude_list[@]}"; do
                     exclude="${exclude} --exclude='${ex}'"
                 done
-                echo rsync ${rsync_options} ${exclude} $url $path >> $log
-                rsync ${rsync_options} ${exclude} $url $path >> $log 2>> ${log}-error
+                echo rsync ${rsync_options} ${exclude} $url $full_path >> $log
+                rsync ${rsync_options} ${exclude} $url $full_path >> $log 2>> ${log}-error
                 ;;
             "ftpsync")
                 cd ${BASE_DIR}/scripts
-                export BASE_DIR=${BASE_DIR}
+
+                export DEB_ADMIN="Morgan <mirror@devpg.net>"
+                export DEB_COUNTRY="Korea"
+                export DEB_LOCATION="Korea/Seoul"
+                export DEB_PATH="$full_path"
+                export DEB_HOST="$(parse_yaml global.hostname)"
+                export DEB_UPSTREAM="$url"
+                export DEB_LOG="${BASE_DIR}/$(parse_yaml global.log_dir)"
+                
                 ./ftpsync >> $log 2>> ${log}-error
                 cd ${BASE_DIR}
                 ;;
             "http")
                 echo ${repo} Fetch >> $log 2>> ${log}-error
-                python3 -u $BASE_DIR/scripts/getFetch.py "${url}" $path $BASE_DIR/scripts/${path}.fetch >> $log 2>> ${log}-error
+                python3 -u $BASE_DIR/scripts/getFetch.py "${url}" $full_path $BASE_DIR/scripts/${path}.fetch >> $log 2>> ${log}-error
                 echo ${repo} Download >> $log 2>> ${log}-error
                 python3 -u $BASE_DIR/scripts/getFile.py $BASE_DIR/scripts/${path}.fetch >> $log 2>> ${log}-error
                 ;;
@@ -277,6 +285,7 @@ for repo in "${repos[@]}"; do
 
         repo_post_scripts=($(get_repo_config ${repo} "scripts.post[]"))
         for script in "${repo_post_scripts[@]}"; do
+            script=${script/\${config\}/$CONFIG}
             execute $BASE_DIR/$script $repo
         done
     fi

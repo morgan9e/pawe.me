@@ -5,28 +5,34 @@ import yaml
 import jinja2
 import datetime
 
-BASE_DIR = "."
-CONFIG_PATH = os.path.join(BASE_DIR, "scripts/config.yml")
-TEMPLATES_DIR = os.path.join(BASE_DIR, "scripts/templates")
-LOG_DIR = os.path.join(BASE_DIR, "logs")
-SYNC_LOG = os.path.join(LOG_DIR, "sync.log")
-OUTPUT_PATH = os.path.join(BASE_DIR, "index.html")
-
-def get_last_sync(repo_name):
-    if os.path.exists(SYNC_LOG):
-        with open(SYNC_LOG, 'r') as log_file:
-            log_all = reversed(log_file.readlines())
-            for logline in log_all:
-                dist, time, stat = logline.split()
-                if repo_name == dist and stat =="SUCCESS":
-                    return datetime.datetime.strptime(time, '%Y-%m-%dT%H:%MZ').strftime("%Y-%m-%d %H:%M")
-    return "Not Synced"
+# def get_last_sync(repo_name):
+#     if os.path.exists(SYNC_LOG):
+#         with open(SYNC_LOG, 'r') as log_file:
+#             log_all = reversed(log_file.readlines())
+#             for logline in log_all:
+#                 dist, time, stat = logline.split()
+#                 if repo_name == dist and stat =="SUCCESS":
+#                     return datetime.datetime.strptime(time, '%Y-%m-%dT%H:%MZ').strftime("%Y-%m-%d %H:%M")
+#     return "Not Synced"
 
 # main()
 
 if __name__=="__main__":
+
+    if len(sys,argv) == 3:
+        print(sys.argv)
+
+    CONFIG_PATH = sys.argv[1]
+
     with open(CONFIG_PATH, 'r') as f:
         config = yaml.safe_load(f)
+
+
+    BASE_DIR = config.get("BASE_DIR", ".")
+    THEME = "new"
+    TEMPLATES_DIR = os.path.join(os.path.join(BASE_DIR, "scripts/templates"), THEME)
+    LOG_DIR = os.path.join(BASE_DIR, config['global'].get("log_dir", "logs"))
+    OUTPUT_PATH = os.path.join(os.path.join(BASE_DIR, config['global'].get("data_dir", ".")), "index.html")
 
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(TEMPLATES_DIR))
     base_template = env.get_template('base.html')
@@ -50,8 +56,8 @@ if __name__=="__main__":
             context = {
                 'path': repo_data['path'],
                 'name': repo_data['name'],
-                'lastsync': get_last_sync(repo_name),
-                # 'lastsync': repo_data.get('lastsync', "Not Synced"),
+                # 'lastsync': get_last_sync(repo_name),
+                'lastsync': repo_data.get('lastsync', "Not Synced"),
                 'upstream': repo_data['url']
             }
             print(context)

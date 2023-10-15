@@ -8,6 +8,8 @@ global:
     pre:
     post:
   log: logs/sync.log
+  log_dir: logs/
+  data_dir: pub/
   sync:
     - ALL
 
@@ -18,8 +20,9 @@ defaults:
     fail:
       - scripts/alert.sh
     post:
-      - scripts/index.py
+      - scripts/index.py ${config}
   log: logs/${path}.log
+  delay: 4
   rsync:
     options: "-rtlHpv --chmod=D0755,F0644 --partial --hard-links --safe-links --stats --delete --delete-after --delay-updates --max-delete=70000"
     exclude:
@@ -35,47 +38,44 @@ defaults:
 repos:
   ARCHLINUX:
     url: rsync://mirrors.xtom.de/archlinux/
-    delay: 4
     name: "ArchLinux (x86_64)"
     path: archlinux
 
   UBUNTU:
     url: rsync://rsync.archive.ubuntu.com/ubuntu/
-    delay: 4
     name: "Ubuntu"
     path: ubuntu
 
   UBUNTU_CD:
     url: rsync://releases.ubuntu.com/releases/
-    delay: 12
     name: "Ubuntu Releases"
+    delay: 6
     path: ubuntu_cd
 
   UBUNTU_CD_OLD:
     url: rsync://old-releases.ubuntu.com/releases/
-    delay: 12
     name: "Ubuntu Releases (Old)"
+    delay: 12
     path: ubuntu_cd_old
 
   DEBIAN:
-    url: rsync://mirrors.xtom.jp/debian/
+    url: rsync://mirrors.xtom.jp/
     type: ftpsync
-    delay: 4
     name: Debian
     path: debian
     scripts:
+
     # pre: scripts/pre_debian.sh
     last_sync: "2023-10-12T10:58Z"
   
   DEBIAN_CD:
     url: rsync://ftp.lanet.kr/debian-cd/
-    delay: 12
+    delay: 6
     name: "Debian CD"
     path: debian_cd
   
   FEDORA:
     url: rsync://dl.fedoraproject.org/fedora-enchilada/linux/
-    delay: 4
     name: "Fedora"
     path: fedora
   
@@ -87,7 +87,6 @@ repos:
   
   MANJARO:
     url: rsync://ftp.riken.jp/manjaro/
-    delay: 4
     name: Manjaro
     path: manjaro
   
@@ -105,6 +104,18 @@ repos:
     type: http
     delay: 12
 
+  GNU:
+    name: "GNU"
+    path: gnu
+    url: rsync://ftp.gnu.org/gnu/
+    delay: 12
+
+  LINUX:
+    name: "Linux Kernel"
+    path: linux
+    url: rsync://rsync.kernel.org/pub/
+    delay: 12
+
 index:
   - ARCHLINUX
   - UBUNTU UBUNTU_CD
@@ -115,4 +126,6 @@ index:
   - DIVIDER
   - ARCHLINUXARM
   - ASAHILINUX
+  - GNU
+  - LINUX
   - UBUNTU_CD_OLD
