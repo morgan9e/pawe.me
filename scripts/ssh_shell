@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+TIME="$(TZ='Asia/Seoul' date +%Y-%m-%d_%H-%M)"
+CLIENT_IP=$(echo $SSH_CLIENT | awk '{print $1}')
+
+echo remote: You are connected to SSH Shell from $CLIENT_IP.
+
+echo [$TIME] Client: "$CLIENT_IP", Argument: "$SSH_ORIGINAL_COMMAND" >> ssh_log
+
+ssh -p $INT_PORT user@$INT_HOST $SSH_ORIGINAL_COMMAND
