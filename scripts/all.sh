@@ -1,0 +1,12 @@
+/srv/mirror/scripts/sync.sh archlinux &
+/srv/mirror/scripts/sync.sh fedora &
+/srv/mirror/scripts/sync.sh debian &
+/srv/mirror/scripts/sync.sh ubuntu &
+/srv/mirror/scripts/sync.sh kali &
+/srv/mirror/scripts/sync.sh manjaro &
+/srv/mirror/scripts/sync.sh raspbian &
+/srv/mirror/scripts/sync.sh ubuntu_cd &
+/srv/mirror/scripts/sync.sh kali_images &
+/srv/mirror/scripts/sync.sh debian_cd &
+/srv/mirror/scripts/sync.sh linux &
+/srv/mirror/scripts/sync.sh gnu &

@@ -1,86 +1,67 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 
-import os, sys
-import yaml
-import jinja2
+import os, sys, re
 import datetime
 
-# def get_last_sync(repo_name):
-#     if os.path.exists(SYNC_LOG):
-#         with open(SYNC_LOG, 'r') as log_file:
-#             log_all = reversed(log_file.readlines())
-#             for logline in log_all:
-#                 dist, time, stat = logline.split()
-#                 if repo_name == dist and stat =="SUCCESS":
-#                     return datetime.datetime.strptime(time, '%Y-%m-%dT%H:%MZ').strftime("%Y-%m-%d %H:%M")
-#     return "Not Synced"
+base_path = sys.argv[1]
+out_path = sys.argv[2]
+assert os.path.exists(base_path)
 
-# main()
+log_path = os.path.join(base_path, "logs/all.log")
+assert os.path.exists(log_path)
 
-if __name__=="__main__":
+html_path = os.path.join(base_path, "scripts/base.html")
+index = os.path.join(out_path, "index.html")
+assert os.path.exists(html_path)
 
-    if len(sys,argv) == 3:
-        print(sys.argv)
+with open(log_path, 'r') as f:
+    log_file = f.read().splitlines()
+log_file.reverse()
 
-    CONFIG_PATH = sys.argv[1]
+with open(html_path, 'r') as f:
+    html_file = f.read()
+dists = re.findall("@@([^@@]+)@@", html_file)
 
-    with open(CONFIG_PATH, 'r') as f:
-        config = yaml.safe_load(f)
+print(dists)
 
+logs = {}
+for dist in dists:
+    logs[dist] = []
 
-    BASE_DIR = config.get("BASE_DIR", ".")
-    THEME = "new"
-    TEMPLATES_DIR = os.path.join(os.path.join(BASE_DIR, "scripts/templates"), THEME)
-    LOG_DIR = os.path.join(BASE_DIR, config['global'].get("log_dir", "logs"))
-    OUTPUT_PATH = os.path.join(os.path.join(BASE_DIR, config['global'].get("data_dir", ".")), "index.html")
+for dist in logs:
+    for logline in log_file:
+        time, stat, disk = logline.split(" ")
+        if stat == "DONE" and dist == disk:
+            logs[dist] = datetime.datetime.strptime(time, '%Y%m%d_%H%M').strftime("%Y-%m-%d %H:%M")
+            break
+        logs[dist] = "Not Synced"
 
-    env = jinja2.Environment(loader=jinja2.FileSystemLoader(TEMPLATES_DIR))
-    base_template = env.get_template('base.html')
-    full_template = env.get_template('full.html')
-    half_template = env.get_template('half.html')
+stats = {}
+for dist in dists:
+    for logline in log_file:
+        time, stat, disk = logline.split(" ")
+        if dist == disk:
+            stats[dist] = stat, datetime.datetime.strptime(time, '%Y%m%d_%H%M').strftime("%Y-%m-%d %H:%M")
+            break
+        stats[dist] = (-1, "Not Synced")
 
-    main_repos = []
-    additional_repos = []
+print(logs)
+print(stats)
 
-    DIV = 0
-    for line in config['index']:
-        if line == "DIVIDER":
-            DIV = 1
-            continue
-        repos_line = line.split()
-        for repo_name in repos_line:
-            repo_data = config['repos'].get(repo_name)
-            if not repo_data:
-                continue
+for dist in dists:
+    stat, tt = stats[dist]
+    if stat == "ERROR":
+        stat = f" (Error @ {tt})"
+    elif stat == "STARTED":
+        stat = f" (Running @ {tt})"
+    else:
+        stat = ""
+    
+    if stat:
+        stat = f"</p><p class=\"text-gray-500 dark:text-gray-400\">{stat}</p>"
+    html_file = html_file.replace(f"@@{dist}@@", f"{logs[dist]}{stat}")
 
-            context = {
-                'path': repo_data['path'],
-                'name': repo_data['name'],
-                # 'lastsync': get_last_sync(repo_name),
-                'lastsync': repo_data.get('lastsync', "Not Synced"),
-                'upstream': repo_data['url']
-            }
-            print(context)
-            if len(repos_line) > 1:
-                (main_repos if not DIV else additional_repos).append(half_template.render(**context))
-            else:
-                (main_repos if not DIV else additional_repos).append(full_template.render(**context))
+with open(index, 'w') as f:
+    f.write(html_file)
 
-    html_output = base_template.render(
-        repos="\n".join(main_repos),
-        repos_more="\n".join(additional_repos)
-    )
-
-    try:
-        with open(OUTPUT_PATH, 'w') as f:
-            f.write(html_output)
-
-    except:
-        if len(sys.argv) == 2:
-            if os.path.exists(sys.argv[1]):
-                if not os.path.isdir(sys.argv[1]):
-                    print(f"Writing to {sys.argv[1]}")
-                    with open(sys.argv[1], 'w') as f:
-                        f.write(html_output)
-        else:
-            print(html_output)
+print("Written to index.html")
